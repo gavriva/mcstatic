@@ -1,0 +1,12 @@
+#!/bin/sh
+export MC_ETC_DIR=$APPDIR/etc/mc
+export MC_SHARE_DIR=$APPDIR/share/mc
+export MC_LIBEXECDIR=$APPDIR/libexec/mc
+
+if test "$(id -u)" -ne "0"; then
+    colorarg=""
+else
+    colorarg="selected=color253;color88:markselect=color228;color88;bold"
+fi
+
+exec $APPDIR/bin/mc -C "${colorarg}" $@

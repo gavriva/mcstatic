@@ -1,0 +1,116 @@
+diff --git src/filemanager/panel.c src/filemanager/panel.c
+--- src/filemanager/panel.c
++++ src/filemanager/panel.c
+@@ -36,6 +36,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <math.h>
+ 
+ #include "lib/global.h"
+ 
+@@ -90,6 +91,7 @@ panelized_panel_t panelized_panel = { {NULL, 0, -1}, NULL };
+ 
+ static const char *string_file_name (file_entry_t *, int);
+ static const char *string_file_size (file_entry_t *, int);
++static const char *string_file_hsize (file_entry_t *, int);
+ static const char *string_file_size_brief (file_entry_t *, int);
+ static const char *string_file_type (file_entry_t *, int);
+ static const char *string_file_mtime (file_entry_t *, int);
+@@ -205,6 +207,14 @@ static panel_field_t panel_fields[] = {
+      (GCompareFunc) sort_size
+     }
+     ,
++    {
++     "hsize", 7, FALSE, J_RIGHT,
++     N_("sort|s"),
++     N_("&Size"), TRUE, TRUE,
++     string_file_hsize,
++     (GCompareFunc) sort_size
++    }
++    ,
+     {
+      "bsize", 7, FALSE, J_RIGHT,
+      "",
+@@ -522,6 +532,63 @@ string_file_size (file_entry_t * fe, int len)
+     return buffer;
+ }
+ 
++/* --------------------------------------------------------------------------------------------- */
++/** hsize */
++
++static void hsize_to_buf(char *buffer, int len, uintmax_t size, gboolean use_si)
++{
++    static const char *const suffix1000[] = { "B", "K", "M", "G", "T", "P", "E", "Z", "Y", NULL };
++    static const char *const suffix1024[] = { " B", "kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB", NULL };
++
++    static const double log1000 = log(1000.0);
++    static const double log1024 = log(1024.0);
++
++    const char *const *sfx     = use_si ? suffix1000 : suffix1024;
++    const double       logBase = use_si ? log1000 : log1024;
++    const double       base    = use_si ? 1000.0 : 1024.0;
++
++    if (size < 10) {
++        g_snprintf (buffer, len + 1, "%d  B", (int)size);
++        return;
++    }
++
++    const double e = floor(log((double)size)/logBase);
++    const char *const suffix = sfx[(int)e];
++    const double value = floor(((double)size)/pow(base, e) * 10.0 + 0.5) / 10.0;
++
++    if (value < 10.0) {
++        g_snprintf (buffer, len + 1, "%.1f %s", value, suffix);
++    } else {
++        g_snprintf (buffer, len + 1, "%.0f %s", value, suffix);
++    }
++}
++
++static const char *
++string_file_hsize (file_entry_t * fe, int len)
++{
++    static char buffer[BUF_TINY];
++
++    if (len != 7)
++        return string_file_size(fe, len);
++
++
++    if (DIR_IS_DOTDOT (fe->fname) || link_isdir (fe))
++        return _("");
++
++    if (S_ISDIR (fe->st.st_mode) && fe->f.dir_size_computed == 0)
++        return _("");
++
++#ifdef HAVE_STRUCT_STAT_ST_RDEV
++    if (S_ISBLK (fe->st.st_mode) || S_ISCHR (fe->st.st_mode)) {
++        format_device_number (buffer, len + 1, fe->st.st_rdev);
++        return buffer;
++    }
++#endif
++
++    hsize_to_buf(buffer, len, fe->st.st_size, panels_options.kilobyte_si);
++
++    return buffer;
++}
+ /* --------------------------------------------------------------------------------------------- */
+ /** bsize */
+ 
+@@ -1937,7 +2004,7 @@ panel_format (WPanel * panel)
+ 
+     default:
+     case list_full:
+-        return "half type name | size | mtime";
++        return "half type name | hsize | mtime";
+     }
+ }
+ 
+@@ -1958,7 +2025,7 @@ mini_status_format (WPanel * panel)
+         return "half type name space bsize space perm space";
+ 
+     case list_full:
+-        return "half type name";
++        return "half type name space size space perm";
+ 
+     default:
+     case list_user:

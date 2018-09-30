@@ -1,0 +1,12 @@
+diff --git src/setup.c src/setup.c
+--- src/setup.c
++++ src/setup.c
+@@ -130,7 +130,7 @@ int saving_setup;
+ 
+ panels_options_t panels_options = {
+     .show_mini_info = TRUE,
+-    .kilobyte_si = FALSE,
++    .kilobyte_si = TRUE,
+     .mix_all_files = FALSE,
+     .show_backups = TRUE,
+     .show_dot_files = TRUE,

@@ -1,0 +1,13 @@
+diff --git src/setup.c src/setup.c
+index f0fe3a78c..945b16bd7 100644
+--- src/setup.c
++++ src/setup.c
+@@ -1463,7 +1463,7 @@ panel_load_setup (WPanel * panel, const char *section)
+         mc_config_get_bool (mc_global.panels_config, section, "reverse", FALSE);
+     panel->sort_info.case_sensitive =
+         mc_config_get_bool (mc_global.panels_config, section, "case_sensitive",
+-                            OS_SORT_CASE_SENSITIVE_DEFAULT);
++                            FALSE);
+     panel->sort_info.exec_first =
+         mc_config_get_bool (mc_global.panels_config, section, "exec_first", FALSE);
+ 

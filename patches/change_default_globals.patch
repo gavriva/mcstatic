@@ -1,0 +1,19 @@
+diff --git src/args.c src/args.c
+--- src/args.c
++++ src/args.c
+@@ -47,12 +47,12 @@
+ /*** global variables ****************************************************************************/
+ 
+ /* If true, assume we are running on an xterm terminal */
+-gboolean mc_args__force_xterm = FALSE;
++gboolean mc_args__force_xterm = TRUE;
+ 
+-gboolean mc_args__nomouse = FALSE;
++gboolean mc_args__nomouse = TRUE;
+ 
+ /* Force colors, only used by Slang */
+-gboolean mc_args__force_colors = FALSE;
++gboolean mc_args__force_colors = TRUE;
+ 
+ /* Don't load keymap from file and use default one */
+ gboolean mc_args__nokeymap = FALSE;

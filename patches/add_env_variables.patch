@@ -1,0 +1,52 @@
+diff --git src/main.c src/main.c
+--- src/main.c
++++ src/main.c
+@@ -124,18 +124,23 @@ static void
+ OS_Setup (void)
+ {
+     const char *datadir_env;
++    const char *sharedatadir_env;
+ 
+     mc_shell_init ();
+ 
+     /* This is the directory, where MC was installed, on Unix this is DATADIR */
+     /* and can be overriden by the MC_DATADIR environment variable */
+-    datadir_env = g_getenv ("MC_DATADIR");
++    datadir_env = g_getenv ("MC_ETC_DIR");
+     if (datadir_env != NULL)
+         mc_global.sysconfig_dir = g_strdup (datadir_env);
+     else
+         mc_global.sysconfig_dir = g_strdup (SYSCONFDIR);
+ 
+-    mc_global.share_data_dir = g_strdup (DATADIR);
++    sharedatadir_env = g_getenv ("MC_SHARE_DIR");
++    if (sharedatadir_env)
++        mc_global.share_data_dir = g_strdup (sharedatadir_env);
++    else
++        mc_global.share_data_dir = g_strdup (DATADIR);
+ }
+ 
+ /* --------------------------------------------------------------------------------------------- */
+diff --git src/vfs/extfs/extfs.c src/vfs/extfs/extfs.c
+--- src/vfs/extfs/extfs.c
++++ src/vfs/extfs/extfs.c
+@@ -1660,13 +1660,18 @@ static int
+ extfs_init (struct vfs_class *me)
+ {
+     gboolean d1, d2;
++    const char *p;
+ 
+     (void) me;
+ 
+     /* 1st: scan user directory */
+     d1 = extfs_get_plugins (mc_config_get_data_path (), TRUE);  /* silent about user dir */
+     /* 2nd: scan system dir */
+-    d2 = extfs_get_plugins (LIBEXECDIR, d1);
++    p = getenv("MC_LIBEXECDIR");
++    if (p)
++        d2 = extfs_get_plugins (p, d1);
++    else
++        d2 = extfs_get_plugins (LIBEXECDIR, d1);
+ 
+     return (d1 || d2 ? 1 : 0);
+ }

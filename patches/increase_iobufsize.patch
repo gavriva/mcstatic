@@ -1,0 +1,12 @@
+diff --git src/filemanager/ioblksize.h src/filemanager/ioblksize.h
+--- src/filemanager/ioblksize.h
++++ src/filemanager/ioblksize.h
+@@ -73,7 +73,7 @@
+  */
+ 
+ 
+-enum { IO_BUFSIZE = 128 * 1024 };
++enum { IO_BUFSIZE = 4 * 1024 * 1024 };
+ 
+ /* *INDENT-ON* */
+ 

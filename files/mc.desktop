@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=Midnight Commander
+Type=Application
+Exec=mc
+Icon=mc
+Terminal=true
